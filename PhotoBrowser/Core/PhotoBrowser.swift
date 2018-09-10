@@ -19,7 +19,7 @@ open class PhotoBrowser: UIViewController {
 
     /// 图片加载器
     open var photoLoader: PhotoLoader
-
+    
     /// 左右两张图之间的间隙
     open var photoSpacing: CGFloat = 30
 
@@ -132,6 +132,7 @@ open class PhotoBrowser: UIViewController {
     /// - parameter originPageIndex: 打开时的初始页码，第一页为 0.
     public init(animationType: AnimationType = .scale,
                 delegate: PhotoBrowserDelegate? = nil,
+                imageContainerProvider: ImageContainerProvider = DefaultImageContainerProvider.shared,
                 photoLoader: PhotoLoader? = nil,
                 originPageIndex: Int = 0) {
         self.photoLoader = photoLoader ?? {
@@ -139,6 +140,7 @@ open class PhotoBrowser: UIViewController {
             assert(cls != nil, "请传入你实现的 photoLoader 或在 Podfile 中添加 PhotoBrowser/Kingfisher")
             return (cls as! NSObject.Type).init() as! PhotoLoader
             }()
+        ContainerProviderManager.default.provider = imageContainerProvider
         super.init(nibName: nil, bundle: nil)
         self.transitioningDelegate = self
         self.modalPresentationStyle = .custom
@@ -541,11 +543,11 @@ extension PhotoBrowser: UIViewControllerTransitioningDelegate {
     /// 创建缩放型进场动画
     private func makeScalePresentationAnimator(indexPath: IndexPath) -> UIViewControllerAnimatedTransitioning {
         let cell = collectionView.cellForItem(at: indexPath) as? PhotoBrowserCell
-        let imageView = UIImageView(image: cell?.imageView.image)
+        let imageView = UIImageView(image: cell?.imageView.getImage)
         imageView.contentMode = imageScaleMode
         imageView.clipsToBounds = true
         // 创建animator
-        return ScaleAnimator(startView: relatedView, endView: cell?.imageView, scaleView: imageView)
+        return ScaleAnimator(startView: relatedView, endView: cell?.imageView.view, scaleView: imageView)
     }
 
     /// 创建缩放型退场动画
@@ -553,10 +555,10 @@ extension PhotoBrowser: UIViewControllerTransitioningDelegate {
         guard let cell = collectionView.visibleCells.first as? PhotoBrowserCell else {
             return nil
         }
-        let imageView = UIImageView(image: cell.imageView.image)
+        let imageView = UIImageView(image: cell.imageView.getImage)
         imageView.contentMode = imageScaleMode
         imageView.clipsToBounds = true
-        return ScaleAnimator(startView: cell.imageView, endView: relatedView, scaleView: imageView)
+        return ScaleAnimator(startView: cell.imageView.view, endView: relatedView, scaleView: imageView)
     }
 }
 

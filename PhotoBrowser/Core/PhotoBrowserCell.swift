@@ -34,6 +34,21 @@ public protocol PhotoBrowserCellDelegate: NSObjectProtocol {
     func photoBrowserCellDidLoadImage(_ cell: PhotoBrowserCell, placeholder: UIImage?, url: URL?)
 }
 
+public protocol ImageContainer: class {
+    
+    var getImage: UIImage? {get}
+    var contentMode: UIViewContentMode {get set}
+    var view: UIView {get}
+    var frame: CGRect {get set}
+    var clipsToBounds: Bool {get set}
+}
+
+public protocol ImageContainerProvider {
+    
+    func createImageContainer() -> ImageContainer
+    func add(imageContainer: ImageContainer, to view: UIView)
+}
+
 open class PhotoBrowserCell: UICollectionViewCell {
 
     //
@@ -50,7 +65,7 @@ open class PhotoBrowserCell: UICollectionViewCell {
     open var photoLoader: PhotoLoader?
 
     /// 显示图像
-    open let imageView = UIImageView()
+    open var imageView = ContainerProviderManager.default.provider.createImageContainer()
 
     /// 保存原图url，用于点查看原图时使用
     open var rawUrl: URL?
@@ -86,7 +101,7 @@ open class PhotoBrowserCell: UICollectionViewCell {
 
     /// 取图片适屏size
     private var fitSize: CGSize {
-        guard let image = imageView.image else {
+        guard let image = imageView.getImage else {
             return CGSize.zero
         }
         let width = scrollView.bounds.width
@@ -121,10 +136,9 @@ open class PhotoBrowserCell: UICollectionViewCell {
         if #available(iOS 11.0, *) {
             scrollView.contentInsetAdjustmentBehavior = .never
         }
-
-        scrollView.addSubview(imageView)
+        let imageContainerProvider = ContainerProviderManager.default.provider
+        imageContainerProvider.add(imageContainer: imageView, to: scrollView)
         imageView.clipsToBounds = true
-
         // 长按手势
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(onLongPress(_:)))
         contentView.addGestureRecognizer(longPress)
@@ -159,7 +173,11 @@ open class PhotoBrowserCell: UICollectionViewCell {
     private func layout() {
         scrollView.frame = contentView.bounds
         scrollView.setZoomScale(1.0, animated: false)
-        imageView.frame = fitFrame
+        var rect = fitFrame
+        if rect.size == CGSize.zero {
+            rect = bounds
+        }
+        imageView.frame = rect
         scrollView.setZoomScale(1.0, animated: false)
 
         cellDelegate?.photoBrowserCellDidLayout(self)
@@ -213,7 +231,7 @@ open class PhotoBrowserCell: UICollectionViewCell {
     /// 加载原图
     open func loadRawImage() {
         guard let url = rawUrl else { return }
-        loadImage(withPlaceholder: imageView.image, url: url, completion: { [weak self] in
+        loadImage(withPlaceholder: imageView.getImage, url: url, completion: { [weak self] in
             self?.layout()
         })
     }
@@ -227,7 +245,7 @@ extension PhotoBrowserCell {
     /// 响应单击
     @objc open func onSingleTap() {
         if let dlg = cellDelegate {
-            dlg.photoBrowserCell(self, didSingleTap: imageView.image)
+            dlg.photoBrowserCell(self, didSingleTap: imageView.getImage)
         }
     }
 
@@ -237,7 +255,7 @@ extension PhotoBrowserCell {
         // 否则重置到原比例
         if scrollView.zoomScale == 1.0 {
             // 以点击的位置为中心，放大
-            let pointInView = dbTap.location(in: imageView)
+            let pointInView = dbTap.location(in: imageView.view)
             let w = scrollView.bounds.size.width / imageZoomScaleForDoubleTap
             let h = scrollView.bounds.size.height / imageZoomScaleForDoubleTap
             let x = pointInView.x - (w / 2.0)
@@ -250,7 +268,7 @@ extension PhotoBrowserCell {
 
     /// 响应拖动
     @objc open func onPan(_ pan: UIPanGestureRecognizer) {
-        guard imageView.image != nil else {
+        guard imageView.getImage != nil else {
             return
         }
         switch pan.state {
@@ -308,19 +326,19 @@ extension PhotoBrowserCell {
         }
         // 如果图片当前显示的size小于原size，则重置为原size
         let size = fitSize
-        let needResetSize = imageView.bounds.size.width < size.width
-            || imageView.bounds.size.height < size.height
+        let needResetSize = imageView.view.bounds.size.width < size.width
+            || imageView.view.bounds.size.height < size.height
         UIView.animate(withDuration: 0.25) {
-            self.imageView.center = self.centerOfContentSize
+            self.imageView.view.center = self.centerOfContentSize
             if needResetSize {
-                self.imageView.bounds.size = size
+                self.imageView.view.bounds.size = size
             }
         }
     }
 
     /// 响应长按
     @objc open func onLongPress(_ press: UILongPressGestureRecognizer) {
-        if press.state == .began, let dlg = cellDelegate, let image = imageView.image {
+        if press.state == .began, let dlg = cellDelegate, let image = imageView.getImage {
             dlg.photoBrowserCell(self, didLongPressWith: image, gesture: press)
         }
     }
@@ -332,11 +350,11 @@ extension PhotoBrowserCell {
 
 extension PhotoBrowserCell: UIScrollViewDelegate {
     open func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        return imageView
+        return imageView.view
     }
 
     open func scrollViewDidZoom(_ scrollView: UIScrollView) {
-        imageView.center = centerOfContentSize
+        imageView.view.center = centerOfContentSize
     }
 }
 

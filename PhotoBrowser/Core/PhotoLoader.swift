@@ -10,11 +10,11 @@ import Foundation
 /// PhotoLoader 实现者必须是 NSObject 子类
 public protocol PhotoLoader {
     /// 是否有指定的缓存图片
-    func isImageCached(on imageView: UIImageView, url: URL) -> Bool
+    func isImageCached(on imageView: ImageContainer, url: URL) -> Bool
 
     /// 加载图片并设置给 imageView
     /// 加载本地图片时，url 为空，placeholder 为本地图片
-    func setImage(on imageView: UIImageView,
+    func setImage(on imageView: ImageContainer,
                   url: URL?,
                   placeholder: UIImage?,
                   progressBlock: @escaping (_ receivedSize: Int64, _ totalSize: Int64) -> Void,
