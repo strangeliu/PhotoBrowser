@@ -50,9 +50,11 @@ open class PhotoBrowser: UIViewController {
 
     /// Cell 插件组
     /// 默认值[ProgressViewPlugin(), RawImageButtonPlugin()]
-    open lazy var cellPlugins: [PhotoBrowserCellPlugin] = {
-        return [ProgressViewPlugin(), RawImageButtonPlugin()]
-    }()
+    open var cellPlugins: [PhotoBrowserCellPlugin] = [ProgressViewPlugin(), RawImageButtonPlugin()] {
+        didSet {
+            collectionView.reloadData()
+        }
+    }
     
     @available(iOS 9.0, *)
     open override var previewActionItems: [UIPreviewActionItem] {

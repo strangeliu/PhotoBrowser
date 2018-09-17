@@ -40,11 +40,9 @@ open class RawImageButtonPlugin: PhotoBrowserCellPlugin {
     }
 
     public func photoBrowserCellDidLoadImage(_ cell: PhotoBrowserCell, placeholder: UIImage?, url: URL?) {
-        if let rawUrl = cell.rawUrl {
-            if let url = url, url != rawUrl {
-                // 显示按钮
-                rawImageButton(for: cell)?.isHidden = false
-            }
+        if let rawUrl = cell.rawUrl, let url = url, url != rawUrl {
+            // 显示按钮
+            rawImageButton(for: cell)?.isHidden = false
         }
     }
 

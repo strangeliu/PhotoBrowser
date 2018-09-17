@@ -87,7 +87,7 @@ open class PhotoBrowserCell: UICollectionViewCell {
     /// 内嵌容器。本类不能继承UIScrollView。
     /// 因为实测UIScrollView遵循了UIGestureRecognizerDelegate协议，而本类也需要遵循此协议，
     /// 若继承UIScrollView则会覆盖UIScrollView的协议实现，故只内嵌而不继承。
-    open let scrollView = UIScrollView()
+    public let scrollView = UIScrollView()
 
     /// 计算contentSize应处于的中心位置
     private var centerOfContentSize: CGPoint {
@@ -191,24 +191,19 @@ open class PhotoBrowserCell: UICollectionViewCell {
     func setImage(_ placeholder: UIImage?, highQualityUrl: URL?, rawUrl: URL?) {
         // 保存/更新原图url
         self.rawUrl = rawUrl
-
         cellDelegate?.photoBrowserCellSetImage(self, placeholder: placeholder, highQualityUrl: highQualityUrl, rawUrl: rawUrl)
-
         // 若存在原图缓存，直接显示原图
-        if let url = rawUrl,
-            let isCached = photoLoader?.isImageCached(on: imageView, url: url),
-            isCached {
+        if let url = rawUrl, let isCached = photoLoader?.isImageCached(on: imageView, url: url), isCached {
             loadImage(withPlaceholder: placeholder, url: url, completion: { [weak self] in
                 self?.layout()
             })
-            return
+        } else {
+            // 加载大图
+            loadImage(withPlaceholder: placeholder, url: highQualityUrl, completion: { [weak self] in
+                self?.layout()
+            })
+            layout()
         }
-
-        // 加载大图
-        loadImage(withPlaceholder: placeholder, url: highQualityUrl, completion: { [weak self] in
-            self?.layout()
-        })
-        layout()
     }
 
     /// 加载图片
