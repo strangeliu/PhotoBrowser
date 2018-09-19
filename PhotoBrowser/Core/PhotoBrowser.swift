@@ -176,6 +176,9 @@ open class PhotoBrowser: UIViewController {
         plugins.forEach {
             $0.photoBrowser(self, viewWillAppear: view, animated: animated)
         }
+        if isPreviewing {
+            scrollToItem(currentIndex, at: .left, animated: false)
+        }
     }
     
     open override func viewDidAppear(_ animated: Bool) {
