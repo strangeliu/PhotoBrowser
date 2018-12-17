@@ -136,12 +136,20 @@ open class JXPhotoBrowser: UIViewController {
     
     open override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        layout()
         delegate.photoBrowserViewWillLayoutSubviews(self)
     }
     
+    private var lastLayoutSize: CGSize?
+    
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        if let lastLayoutSize = lastLayoutSize, lastLayoutSize == view.bounds.size {
+        } else {
+            layout()
+            collectionView.reloadData()
+            scrollToItem(pageIndex, at: .left, animated: false)
+        }
+        lastLayoutSize = view.bounds.size
         delegate.photoBrowserViewDidLayoutSubviews(self)
     }
     

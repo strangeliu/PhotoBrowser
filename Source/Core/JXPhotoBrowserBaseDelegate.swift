@@ -94,6 +94,14 @@ open class JXPhotoBrowserBaseDelegate: NSObject, JXPhotoBrowserDelegate {
     
     /// scrollView滑动
     open func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        
+    }
+    
+    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        browser?.pageIndex = Int(scrollView.contentOffset.x / scrollView.bounds.width)
+    }
+    
+    public func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
         browser?.pageIndex = Int(scrollView.contentOffset.x / scrollView.bounds.width)
     }
     
