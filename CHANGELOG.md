@@ -1,7 +1,24 @@
 # Change Log
 
+## Version 2.2.3
+
+**2019/04/30**
+
+- 支持RTL语言的布局
+- 优化弱网环境下加载网络图片的进度指示显示
+
+## Version 2.2.1
+**2019/04/12**
+
+- 优化屏幕旋转时的闪烁问题
+
+## Version 2.2.0
+**2019/04/01**
+- 支持Kingfisher 5.x，同时最低支持iOS 10.0
+- `JXPhotoLoader`协议替换`imageCached(on:, url:)`为`hasCached(with url:)`
 ## Version 2.1.2
 **2018/12/07**
+
 - 修复显示长图时可能发生的交互BUG
 
 ## Version 2.1.1

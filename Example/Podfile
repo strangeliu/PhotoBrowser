@@ -6,7 +6,7 @@ use_frameworks!
 target 'JXPhotoBrowser_Example' do
     pod 'Kingfisher'
     pod 'JXPhotoBrowser', :path => '../'
-    pod 'libwebp', '1.0.0'
+    pod 'libwebp'
     pod 'JXPhotoBrowser/KingfisherWebP', :path => '../'
 
 end

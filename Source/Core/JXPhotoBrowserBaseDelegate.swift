@@ -19,6 +19,9 @@ open class JXPhotoBrowserBaseDelegate: NSObject, JXPhotoBrowserDelegate {
     /// 长按回调。回传参数分别是：浏览器，图片序号，图片对象，手势对象
     open var longPressedCallback: ((JXPhotoBrowser, Int, UIImage?, UILongPressGestureRecognizer) -> Void)?
     
+    /// 是否Right to left语言
+    open lazy var isRTLLayout = UIApplication.shared.userInterfaceLayoutDirection == .rightToLeft
+    
     //
     // MARK: - 处理状态栏
     //
@@ -94,15 +97,25 @@ open class JXPhotoBrowserBaseDelegate: NSObject, JXPhotoBrowserDelegate {
     
     /// scrollView滑动
     open func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        
-    }
-    
-    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        browser?.pageIndex = Int(scrollView.contentOffset.x / scrollView.bounds.width)
-    }
-    
-    public func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
-        browser?.pageIndex = Int(scrollView.contentOffset.x / scrollView.bounds.width)
+//<<<<<<< HEAD
+//
+//    }
+//
+//    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+//        browser?.pageIndex = Int(scrollView.contentOffset.x / scrollView.bounds.width)
+//    }
+//
+//    public func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+//        browser?.pageIndex = Int(scrollView.contentOffset.x / scrollView.bounds.width)
+//=======
+        var value: CGFloat = 0
+        if isRTLLayout {
+            value = (scrollView.contentSize.width - scrollView.contentOffset.x - scrollView.bounds.width / 2) / scrollView.bounds.width
+        } else {
+            value = (scrollView.contentOffset.x + scrollView.bounds.width / 2) / scrollView.bounds.width
+        }
+        browser?.pageIndex = max(0, Int(value))
+//>>>>>>> 9ba94d8db10a765b514068c697a61aefb7436802
     }
     
     /// 取当前显示页的内容视图。比如是 ImageView.

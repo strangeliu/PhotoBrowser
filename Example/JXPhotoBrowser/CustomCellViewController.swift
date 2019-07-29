@@ -45,9 +45,7 @@ class CustomCellViewController: BaseCollectionViewController {
         if let firstLevel = self.modelArray[indexPath.item].firstLevelUrl {
             let url = URL(string: firstLevel)
             cell.imageView.kf.setImage(with: url)
-        } else {
-            cell.imageView.kf.setImage(with: nil)
-        }
+        } 
         return cell
     }
     
@@ -90,7 +88,8 @@ class CustomCellViewController: BaseCollectionViewController {
         // 转场动画
         let trans = JXPhotoBrowserZoomTransitioning { (browser, index, view) -> UIView? in
             let indexPath = IndexPath(item: index, section: 0)
-            return collectionView.cellForItem(at: indexPath)
+            let cell = collectionView.cellForItem(at: indexPath) as? BaseCollectionViewCell
+            return cell?.imageView
         }
         // 浏览器
         let browser = JXPhotoBrowser(dataSource: dataSource, delegate: delegate, transDelegate: trans)
