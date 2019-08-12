@@ -97,17 +97,24 @@ open class JXPhotoBrowserBaseDelegate: NSObject, JXPhotoBrowserDelegate {
     
     /// scrollView滑动
     open func scrollViewDidScroll(_ scrollView: UIScrollView) {
-//<<<<<<< HEAD
-//
-//    }
-//
-//    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-//        browser?.pageIndex = Int(scrollView.contentOffset.x / scrollView.bounds.width)
-//    }
-//
-//    public func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
-//        browser?.pageIndex = Int(scrollView.contentOffset.x / scrollView.bounds.width)
-//=======
+
+    }
+    
+    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if !decelerate {
+            scrollViewDidEndScroll(scrollView: scrollView)
+        }
+    }
+
+    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        scrollViewDidEndScroll(scrollView: scrollView)
+    }
+
+    public func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        scrollViewDidEndScroll(scrollView: scrollView)
+    }
+    
+    private func scrollViewDidEndScroll(scrollView: UIScrollView) {
         var value: CGFloat = 0
         if isRTLLayout {
             value = (scrollView.contentSize.width - scrollView.contentOffset.x - scrollView.bounds.width / 2) / scrollView.bounds.width
@@ -115,7 +122,6 @@ open class JXPhotoBrowserBaseDelegate: NSObject, JXPhotoBrowserDelegate {
             value = (scrollView.contentOffset.x + scrollView.bounds.width / 2) / scrollView.bounds.width
         }
         browser?.pageIndex = max(0, Int(value))
-//>>>>>>> 9ba94d8db10a765b514068c697a61aefb7436802
     }
     
     /// 取当前显示页的内容视图。比如是 ImageView.
