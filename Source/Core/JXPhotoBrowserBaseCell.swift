@@ -12,6 +12,10 @@ open class JXPhotoBrowserBaseCell: UICollectionViewCell {
     /// 图片允许的最大放大倍率（类属性）
     public static var imageMaximumZoomScale: CGFloat = 2.0
     
+    open var imageViewClass: UIImageView.Type {
+        return UIImageView.self
+    }
+    
     /// 图片允许的最大放大倍率
     open var imageMaximumZoomScale: CGFloat
         = JXPhotoBrowserBaseCell.imageMaximumZoomScale {
@@ -21,7 +25,9 @@ open class JXPhotoBrowserBaseCell: UICollectionViewCell {
     }
     
     /// ImageView
-    open var imageView = UIImageView()
+    open lazy var imageView: UIImageView = {
+        return imageViewClass.init()
+    }()
     
     /// 图片缩放容器
     open var imageContainer = UIScrollView()
