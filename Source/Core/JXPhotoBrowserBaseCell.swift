@@ -91,10 +91,12 @@ open class JXPhotoBrowserBaseCell: UICollectionViewCell {
         singleTap.require(toFail: doubleTap)
         
         // 拖动手势
+        #if !targetEnvironment(macCatalyst)
         let pan = UIPanGestureRecognizer(target: self, action: #selector(onPan(_:)))
         pan.delegate = self
         // 必须加在图片容器上。不能加在contentView上，否则长图下拉不能触发
         imageContainer.addGestureRecognizer(pan)
+        #endif
         // 子类作进一步初始化
         didInit()
     }
